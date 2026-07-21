@@ -1,0 +1,121 @@
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+/* Body */
+body{
+    background:linear-gradient(135deg,#1f1c2c,#928dab);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Container */
+.container{
+    width:420px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:0 15px 35px rgba(0,0,0,.4);
+}
+
+/* Heading */
+h1{
+    color:white;
+    margin-bottom:20px;
+}
+
+/* Status */
+#status{
+    color:white;
+    font-size:20px;
+    margin-bottom:20px;
+    font-weight:600;
+}
+
+/* Board */
+.board{
+    display:grid;
+    grid-template-columns:repeat(3,100px);
+    grid-template-rows:repeat(3,100px);
+    gap:10px;
+    justify-content:center;
+    margin:20px auto;
+}
+
+/* Cell */
+.cell{
+    background:white;
+    border-radius:15px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:45px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+    user-select:none;
+}
+
+/* Hover */
+.cell:hover{
+    background:#dff9fb;
+    transform:scale(1.05);
+}
+
+/* Restart Button */
+#restart{
+    margin-top:20px;
+    padding:12px 30px;
+    border:none;
+    border-radius:12px;
+    background:#00c896;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+/* Button Hover */
+#restart:hover{
+    background:#00a67e;
+    transform:scale(1.05);
+}
+
+/* Winner */
+.winner{
+    color:#00ff99;
+}
+
+/* Draw */
+.draw{
+    color:yellow;
+}
+
+/* Responsive */
+@media(max-width:500px){
+
+.container{
+    width:95%;
+}
+
+.board{
+    grid-template-columns:repeat(3,80px);
+    grid-template-rows:repeat(3,80px);
+}
+
+.cell{
+    font-size:35px;
+}
+
+}
