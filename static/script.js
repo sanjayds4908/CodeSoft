@@ -1,9 +1,11 @@
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
 const restartBtn = document.getElementById("restart");
+const boardElement = document.getElementById("board");
 
 let board = ["", "", "", "", "", "", "", "", ""];
 let gameActive = true;
+let aiThinking = false;
 
 // Winning combinations
 const winningConditions = [
@@ -25,61 +27,90 @@ cells.forEach(cell => {
 // Restart
 restartBtn.addEventListener("click", restartGame);
 
+// =======================
 // Human Move
+// =======================
 async function playerMove() {
 
     const index = this.getAttribute("data-index");
 
-    if (board[index] !== "" || !gameActive)
+    // Prevent extra clicks
+    if (
+        board[index] !== "" ||
+        !gameActive ||
+        aiThinking
+    ) {
         return;
+    }
 
+    // Human move
     board[index] = "X";
     this.textContent = "X";
 
-    if (checkWinner("X"))
-        return;
+    // Check win
+    if (checkWinner("X")) return;
 
-    if (checkDraw())
-        return;
+    // Check draw
+    if (checkDraw()) return;
 
+    // Lock board
+    aiThinking = true;
+    boardElement.style.pointerEvents = "none";
     statusText.innerHTML = "🤖 AI is thinking...";
 
-    // Send board to Flask
-    const response = await fetch("/ai_move", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            board: board
-        })
-    });
+    try {
 
-    const data = await response.json();
+        const response = await fetch("/ai_move", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                board: board
+            })
+        });
 
-    if (data.move !== -1) {
+        const data = await response.json();
 
-        board[data.move] = "O";
+        if (data.move !== -1) {
 
-        cells[data.move].textContent = "O";
+            board[data.move] = "O";
+            cells[data.move].textContent = "O";
+
+        }
+
+        if (checkWinner("O")) return;
+
+        checkDraw();
+
+    }
+    catch(error){
+
+        console.error(error);
+        alert("Error connecting to AI!");
+
+    }
+    finally{
+
+        aiThinking = false;
+        boardElement.style.pointerEvents = "auto";
+
+        if(gameActive){
+            statusText.innerHTML = "Your Turn (X)";
+        }
 
     }
 
-    if (checkWinner("O"))
-        return;
-
-    checkDraw();
-
 }
 
-// Check Winner
+// =======================
+// Winner
+// =======================
 function checkWinner(player) {
 
     for (let win of winningConditions) {
 
-        let a = win[0];
-        let b = win[1];
-        let c = win[2];
+        const [a,b,c] = win;
 
         if (
             board[a] === player &&
@@ -93,19 +124,20 @@ function checkWinner(player) {
                 : "🤖 AI Wins!";
 
             gameActive = false;
+            boardElement.style.pointerEvents = "none";
 
             return true;
         }
 
     }
 
-    statusText.innerHTML = "Your Turn (X)";
-
     return false;
 
 }
 
-// Check Draw
+// =======================
+// Draw
+// =======================
 function checkDraw() {
 
     if (!board.includes("")) {
@@ -113,6 +145,7 @@ function checkDraw() {
         statusText.innerHTML = "🤝 Match Draw!";
 
         gameActive = false;
+        boardElement.style.pointerEvents = "none";
 
         return true;
 
@@ -122,12 +155,17 @@ function checkDraw() {
 
 }
 
-// Restart Game
+// =======================
+// Restart
+// =======================
 function restartGame() {
 
     board = ["","","","","","","","",""];
 
     gameActive = true;
+    aiThinking = false;
+
+    boardElement.style.pointerEvents = "auto";
 
     statusText.innerHTML = "Your Turn (X)";
 
